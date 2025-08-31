@@ -5,7 +5,7 @@
   "main": "readDocxTitle.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc && npx esbuild main.ts --bundle --platform=node --outfile=dist/main.js --format=esm"
+    "build": "npx tsc && npx esbuild main.ts --bundle --platform=node --outfile=dist/main.js --format=esm"
   },
   "keywords": [],
   "author": "",
@@ -14,5 +14,9 @@
   "dependencies": {
     "jszip": "^3.10.1",
     "slimdom": "^4.3.5"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "typescript": "^5.9.2"
   }
 }
