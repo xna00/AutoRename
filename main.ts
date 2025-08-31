@@ -4,6 +4,7 @@ import { DOMParser, serializeToWellFormedString } from "slimdom";
 import jszip from "jszip";
 import { readFileSync, renameSync } from "node:fs";
 import assert from "node:assert";
+import { dirname } from "node:path";
 
 const filePath = process.argv[2];
 if (!filePath) {
@@ -85,5 +86,6 @@ for (const p of paragraphs) {
 // console.log("正在解析文件:", styles, getStyleById("2"));
 console.log("提取到的标题:", title, fontSize);
 if (title) {
-  renameSync(filePath, `${title}.docx`);
+  const dir = dirname(filePath);
+  renameSync(filePath, `${dir}/${title}.docx`);
 }
