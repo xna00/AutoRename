@@ -14,6 +14,11 @@ jobs:
         shell: msys2 {0}
     steps:
       - uses: actions/checkout@v4
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: git make mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-dlfcn
       - name: 安装 Node.js
         uses: actions/setup-node@v4
         with:
@@ -24,11 +29,6 @@ jobs:
 
       - name: 构建
         run: npm run build
-      - uses: msys2/setup-msys2@v2
-        with:
-          msystem: UCRT64
-          update: true
-          install: git make mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-dlfcn
 
       - name: Clone quickjs
         run: git clone --depth 1 -b autorename https://github.com/xna00/quickjs.git
