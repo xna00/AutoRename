@@ -50,84 +50,84 @@ if (!filePath) {
 }
 console.log("filePath", filePath);
 
-(async () => {
-  const file = readFileSync(filePath);
-  const files = UZIP.parse(file);
 
-  console.log("files");
+const file = readFileSync(filePath);
+const files = UZIP.parse(file);
 
-  const documentXml = bufferToString(files["word/document.xml"]);
-  const stylesXml = bufferToString(files["word/styles.xml"]);
+console.log("files");
 
-  assert(documentXml, "无法找到 word/document.xml");
-  assert(stylesXml, "无法找到 word/styles.xml");
+const documentXml = bufferToString(files["word/document.xml"]);
+const stylesXml = bufferToString(files["word/styles.xml"]);
 
-  const styles = new DOMParser().parseFromString(stylesXml, "text/xml");
-  const styleList = styles.getElementsByTagName("w:style");
+assert(documentXml, "无法找到 word/document.xml");
+assert(stylesXml, "无法找到 word/styles.xml");
 
-  const getStyleById = (id: string) =>
-    styleList.find((s) => s.getAttribute("w:styleId") === id);
+const styles = new DOMParser().parseFromString(stylesXml, "text/xml");
+const styleList = styles.getElementsByTagName("w:style");
 
-  const paragraphs = new DOMParser()
-    .parseFromString(documentXml, "text/xml")
-    .getElementsByTagName("w:body")[0]
-    .children.filter((n) => n.nodeName === "w:p");
+const getStyleById = (id: string) =>
+  styleList.find((s) => s.getAttribute("w:styleId") === id);
 
-  // console.log("正在解析文件:", paragraphs.length, "个段落");
+const paragraphs = new DOMParser()
+  .parseFromString(documentXml, "text/xml")
+  .getElementsByTagName("w:body")[0]
+  .children.filter((n) => n.nodeName === "w:p");
 
-  let title = "",
-    fontSize = 0;
+// console.log("正在解析文件:", paragraphs.length, "个段落");
 
-  for (const p of paragraphs) {
-    const wts = p.getElementsByTagName("w:t");
-    const text = wts.map((wt) => wt.textContent?.trim() || "").join("");
-    // console.log(title, text);
-    if (!title && !text) {
-      continue;
-    } else {
-      if (!text) break;
-      const wr = p.getElementsByTagName("w:r").at(0);
-      assert(wr, "段落内没有文本");
-      let size = wr.getElementsByTagName("w:sz").at(0)?.getAttribute("w:val");
-      if (!size) {
-        const ppr = p.getElementsByTagName("w:pPr").at(0);
-        if (ppr) {
-          size = ppr.getElementsByTagName("w:sz").at(0)?.getAttribute("w:val");
-        }
+let title = "",
+  fontSize = 0;
+
+for (const p of paragraphs) {
+  const wts = p.getElementsByTagName("w:t");
+  const text = wts.map((wt) => wt.textContent?.trim() || "").join("");
+  // console.log(title, text);
+  if (!title && !text) {
+    continue;
+  } else {
+    if (!text) break;
+    const wr = p.getElementsByTagName("w:r").at(0);
+    assert(wr, "段落内没有文本");
+    let size = wr.getElementsByTagName("w:sz").at(0)?.getAttribute("w:val");
+    if (!size) {
+      const ppr = p.getElementsByTagName("w:pPr").at(0);
+      if (ppr) {
+        size = ppr.getElementsByTagName("w:sz").at(0)?.getAttribute("w:val");
       }
-      if (!size) {
-        const ppr = p.getElementsByTagName("w:pPr").at(0);
-        if (ppr) {
-          const pStyleId = ppr
-            .getElementsByTagName("w:pStyle")
-            .at(0)
-            ?.getAttribute("w:val");
-          if (pStyleId) {
-            const style = getStyleById(pStyleId);
-            if (style) {
-              size = style
-                .getElementsByTagName("w:rPr")
-                .at(0)
-                ?.getElementsByTagName("w:sz")
-                .at(0)
-                ?.getAttribute("w:val");
-            }
+    }
+    if (!size) {
+      const ppr = p.getElementsByTagName("w:pPr").at(0);
+      if (ppr) {
+        const pStyleId = ppr
+          .getElementsByTagName("w:pStyle")
+          .at(0)
+          ?.getAttribute("w:val");
+        if (pStyleId) {
+          const style = getStyleById(pStyleId);
+          if (style) {
+            size = style
+              .getElementsByTagName("w:rPr")
+              .at(0)
+              ?.getElementsByTagName("w:sz")
+              .at(0)
+              ?.getAttribute("w:val");
           }
         }
       }
-      if (!size || parseInt(size) < 28) break;
-      if (!fontSize) {
-        fontSize = parseInt(size);
-      }
-      if (fontSize !== parseInt(size)) break;
-      else title += p.textContent?.trim() || "";
     }
+    if (!size || parseInt(size) < 28) break;
+    if (!fontSize) {
+      fontSize = parseInt(size);
+    }
+    if (fontSize !== parseInt(size)) break;
+    else title += p.textContent?.trim() || "";
   }
+}
 
-  // console.log("正在解析文件:", styles, getStyleById("2"));
-  console.log("提取到的标题:", title, "字号:", fontSize);
-  if (title) {
-    const dir = dirname(filePath);
-    renameSync(filePath, `${dir}\\${title}.docx`);
-  }
-})();
+// console.log("正在解析文件:", styles, getStyleById("2"));
+console.log("提取到的标题:", title, "字号:", fontSize);
+if (title) {
+  const dir = dirname(filePath);
+  renameSync(filePath, `${dir}\\${title}.docx`);
+}
+
