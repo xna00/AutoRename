@@ -6,13 +6,14 @@ on:
       - main
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
+  windows-msys:
+    name: Windows MSYS2
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
     steps:
-      - name: 检出代码
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
       - name: 安装 Node.js
         uses: actions/setup-node@v4
         with:
@@ -23,29 +24,29 @@ jobs:
 
       - name: 构建
         run: npm run build
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: git make mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-dlfcn
 
       - name: Clone quickjs
         run: git clone --depth 1 -b autorename https://github.com/xna00/quickjs.git
-      
-      - name: Install wine and mingw-w64
-        run: |
-          sudo apt update
-          sudo apt install -y wine mingw-w64
-          cp /usr/x86_64-w64-mingw32/lib/libwinpthread-1.dll .
-        working-directory: ./quickjs
 
-      - name: Setup Wine
+      - name: Build quickjs
         run: |
-          wine --version
-          winecfg /v
-      
+           make -j$(getconf _NPROCESSORS_ONLN) CONFIG_WERROR=y
+        working-directory: ./quickjs
+      - name: Stats
+        run: |
+          ./qjs -qd
+        working-directory: ./quickjs
       - name: Build for Windows
         run: |
-          make CONFIG_WIN32=y -j4
           cp ../dist/main.js ./
-          wine qjsc.exe -e -o autorename.c main.js
-          x86_64-w64-mingw32-gcc autorename.c libquickjs.a -o autorename.exe
-          x86_64-w64-mingw32-strip autorename.exe
+          qjsc.exe -e -o autorename.c main.js
+          gcc autorename.c libquickjs.a -o autorename.exe
+          strip autorename.exe
           cp autorename.exe ../dist/
         working-directory: ./quickjs
 
@@ -54,3 +55,53 @@ jobs:
         with:
           name: dist
           path: dist/
+
+  # build:
+    
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     - name: 检出代码
+  #       uses: actions/checkout@v4
+
+  #     - name: 安装 Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: '24'
+
+  #     - name: 安装依赖
+  #       run: npm i
+
+  #     - name: 构建
+  #       run: npm run build
+
+  #     - name: Clone quickjs
+  #       run: git clone --depth 1 -b autorename https://github.com/xna00/quickjs.git
+      
+  #     - name: Install wine and mingw-w64
+  #       run: |
+  #         sudo apt update
+  #         sudo apt install -y wine mingw-w64
+  #         cp /usr/x86_64-w64-mingw32/lib/libwinpthread-1.dll .
+  #       working-directory: ./quickjs
+
+  #     - name: Setup Wine
+  #       run: |
+  #         wine --version
+  #         winecfg /v
+      
+  #     - name: Build for Windows
+  #       run: |
+  #         make CONFIG_WIN32=y -j4
+  #         cp ../dist/main.js ./
+  #         wine qjsc.exe -e -o autorename.c main.js
+  #         x86_64-w64-mingw32-gcc autorename.c libquickjs.a -o autorename.exe
+  #         x86_64-w64-mingw32-strip autorename.exe
+  #         cp autorename.exe ../dist/
+  #       working-directory: ./quickjs
+
+  #     - name: 上传构建产物
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: dist
+  #         path: dist/
