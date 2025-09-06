@@ -22,7 +22,7 @@ const renameSync = (oldPath: string, newPath: string) => {
   return os.rename(oldPath, newPath);
 };
 
-const dirname = (path: string) => path.split("/").slice(0, -1).join("/");
+const dirname = (path: string) => path.split("\\").slice(0, -1).join("\\");
 
 const assert: <T>(
   c: T,
@@ -128,6 +128,6 @@ console.log("filePath", filePath);
   console.log("提取到的标题:", title, "字号:", fontSize);
   if (title) {
     const dir = dirname(filePath);
-    renameSync(filePath, `${dir}/${title}.docx`);
+    renameSync(filePath, `${dir}\\${title}.docx`);
   }
 })();
