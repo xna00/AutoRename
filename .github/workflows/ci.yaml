@@ -40,7 +40,7 @@ jobs:
       - name: Build for Windows
         run: |
           cp ../dist/main.js ./
-          qjsc.exe -e -o autorename.c main.js
+          ./qjsc.exe -e -o autorename.c main.js
           gcc autorename.c libquickjs.a -o autorename.exe
           strip autorename.exe
           cp autorename.exe ../dist/
