@@ -6,7 +6,7 @@ import { DOMParser, serializeToWellFormedString } from "slimdom";
 import UZIP from "uzip";
 
 const readFileSync = (path: string) => {
-  const f = std.open(path, "r");
+  const f = std.open(path, "rb+");
   const ret: number[] = [];
   while (true) {
     const b = f.getByte();
