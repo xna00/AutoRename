@@ -43,7 +43,7 @@ jobs:
         run: |
           make CONFIG_WIN32=y -j4
           cp ../dist/main.js ./
-          wine qjsc.exe -e main.js -o autorename.c
+          wine qjsc.exe -e -o autorename.c main.js
           x86_64-w64-mingw32-gcc autorename.c libquickjs.a -o autorename.exe
           x86_64-w64-mingw32-strip autorename.exe
           cp autorename.exe ../dist/
