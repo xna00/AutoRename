@@ -4,6 +4,16 @@ import * as std from "std";
 import * as os from "os";
 import { DOMParser, serializeToWellFormedString } from "slimdom";
 import UZIP from "uzip";
+import parseArgs from 'minimist'
+
+const exec = (cmd: string) => {
+  const err = {}
+  const f = std.popen(cmd, "r", err);
+  if (!f) {
+    throw new Error(`Can not run: ${cmd}, errno is ${err}`)
+  }
+  return f.readAsString()
+}
 
 const readFileSync = (path: string) => {
   const f = std.open(path, "rb+");
@@ -43,7 +53,38 @@ const bufferToString = (buf: Uint8Array) => {
   return ret;
 };
 
-const [filePath, err] = os.realpath(globalThis.scriptArgs[1]);
+const args = parseArgs(globalThis.scriptArgs.slice(1))
+const info = `
+1: 设置注册表
+2: 取消设置注册表
+3: 跳过小字
+4: 设置最小字号
+q: 退出
+
+`.trimStart()
+if (!args._[0]) {
+  while(true) {
+    console.log(info)
+    const c = std.getche()
+    const s = String.fromCharCode(c)
+    if (s === '1') {
+      console.log('设置注册表')
+    } else if (s === '2') {
+      console.log('unset')
+    } else if (s === '3') {
+      console.log('skip')
+    } else if (s === '4') {
+      console.log('min')
+    } else if (s === 'q') {
+      std.exit(0)
+    } else {
+      console.log('输入错误')
+    }
+  }
+}
+
+const [filePath, err] = os.realpath(args._[0]);
+
 if (!filePath) {
   console.log("请提供 .docx 文件路径作为参数");
   std.exit(1);

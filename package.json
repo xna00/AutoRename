@@ -13,12 +13,13 @@
   "type": "module",
   "dependencies": {
     "jszip": "^3.10.1",
+    "minimist": "^1.2.8",
     "slimdom": "^4.3.5",
     "uzip": "^0.20201231.0"
   },
   "devDependencies": {
-    "@types/uzip": "^0.20201231.2",
     "@types/node": "^24.3.0",
+    "@types/uzip": "^0.20201231.2",
     "typescript": "^5.9.2"
   }
 }
