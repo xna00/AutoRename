@@ -24,6 +24,31 @@ jobs:
       - name: 构建
         run: npm run build
 
+      - name: Clone quickjs
+        run: git clone --depth 1 -b autorename https://github.com/xna00/quickjs.git
+      
+      - name: Install wine and mingw-w64
+        run: |
+          sudo apt update
+          sudo apt install -y wine mingw-w64
+          cp /usr/x86_64-w64-mingw32/lib/libwinpthread-1.dll .
+        working-directory: ./quickjs
+
+      - name: Setup Wine
+        run: |
+          wine --version
+          winecfg /v
+      
+      - name: Build for Windows
+        run: |
+          make CONFIG_WIN32=y -j4
+          cp ../dist/main.js ./
+          wine qjsc.exe -e main.js -o autorename.c
+          x86_64-w64-mingw32-gcc autorename.c libquickjs.a -o autorename.exe
+          x86_64-w64-mingw32-strip autorename.exe
+          cp autorename.exe ../dist/
+        working-directory: ./quickjs
+
       - name: 上传构建产物
         uses: actions/upload-artifact@v4
         with:
