@@ -5,7 +5,7 @@
   "main": "readDocxTitle.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx tsc && npx esbuild main.qjs.ts --bundle --external:os --external:std --platform=browser --outfile=dist/main.js --format=esm && ./moveImportsToTop.ts"
+    "build": "npx tsc && npx esbuild main.qjs.ts --bundle --external:os --external:std --platform=browser --outfile=dist/main.js --format=esm && node moveImportsToTop.ts"
   },
   "keywords": [],
   "author": "",
