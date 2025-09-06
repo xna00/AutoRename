@@ -18,11 +18,7 @@ jobs:
         with:
           msystem: UCRT64
           update: true
-          install: git make mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-dlfcn
-      - name: 安装 Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24'
+          install: git make mingw-w64-ucrt-x86_64-nodejs mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-dlfcn
 
       - name: 安装依赖
         run: npm i
