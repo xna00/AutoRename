@@ -54,7 +54,7 @@ console.log("filePath", filePath);
 const file = readFileSync(filePath);
 const files = UZIP.parse(file);
 
-console.log("files");
+console.log("files", Object.keys(files));
 
 const documentXml = bufferToString(files["word/document.xml"]);
 const stylesXml = bufferToString(files["word/styles.xml"]);
