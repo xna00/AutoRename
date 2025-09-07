@@ -48,7 +48,9 @@ jobs:
       
       - name: Test
         run: |
+          cp a.docx 测试.docx
           ./dist/autorename.exe a.docx
+          ./dist/autorename.exe 测试.docx
           ls -la
 
       - name: 上传构建产物
