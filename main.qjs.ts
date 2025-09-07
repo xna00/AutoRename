@@ -8,15 +8,14 @@ import parseArgs from "minimist";
 
 const exec = (cmd: string) => {
   const err = {};
-  console.log("run: ", cmd);
+  console.log("Run: ", cmd);
   const f = std.popen(cmd, "r", err);
   if (!f) {
     throw new Error(`Can not run: ${cmd}, errno is ${err}`);
   }
-  console.log("done: ", cmd);
-  console.log("f: ", f);
+  console.log("Done: ", cmd);
   const ret = f.readAsString();
-  console.log("ret: ", ret);
+  console.log("Ret: ", ret);
   return ret;
 };
 
@@ -61,14 +60,36 @@ const bufferToString = (buf: Uint8Array) => {
 const [__filename] = os.realpath(globalThis.scriptArgs[0]);
 console.log(__filename);
 const args = parseArgs(globalThis.scriptArgs.slice(1));
-const info = `
-1: 设置注册表
-2: 取消设置注册表
-3: 跳过小字
-4: 设置最小字号
-q: 退出
+console.log(JSON.stringify(args));
+const menu = [
+  { key: "1", label: "设置注册表", desc: "为 .docx 文件添加右键菜单选项" },
+  { key: "2", label: "取消设置注册表", desc: "移除已添加的右键菜单选项" },
+  {
+    key: "3",
+    label: "跳过小字",
+    desc: "文档标题前面有小字时，忽略这些小字内容",
+  },
+  { key: "4", label: "设置最小字号", desc: "大于等于该字号的内容被认为是标题" },
+];
 
-`.trimStart();
+// 生成美观的菜单界面
+const generateMenu = () => {
+  const header = "===== AutoRename 工具菜单 =====";
+  const separator = "-------------------------------";
+
+  let menuStr = `\n${header}\n${separator}\n`;
+  menu.forEach((item) => {
+    menuStr += `${item.key}: ${item.label}\n  ${item.desc}\n`;
+  });
+  menuStr += `${separator}\n请输入选项 (1-4, q退出): `;
+  return menuStr;
+};
+
+const info = generateMenu();
+const queryRegistry = (entry: string, key?: string) => {
+  const t = exec(`reg query ${entry} ${key ? `/v ${key}` : "/ve"}`);
+  return t;
+};
 const unsetRegistry = () => {
   let oldEntry = "";
   try {
@@ -93,7 +114,6 @@ if (!args._[0]) {
       unsetRegistry();
       console.log("设置注册表");
       const assoc = exec("assoc .docx");
-      console.log("assoc: ", assoc);
       const entry = assoc.split("=")[1].trim();
       console.log("entry: ", entry);
       exec(`reg add HKCR\\${entry}\\shell\\AutoRename /ve /d "自动重命名" /f`);
@@ -102,12 +122,19 @@ if (!args._[0]) {
       exec(
         `reg add HKCR\\${entry}\\shell\\AutoRename\\command /ve /d """"${__filename}""" """%1"""" /f`
       );
-      
+
       exec(`reg add HKCU\\Software\\AutoRename /v Entry /d ${entry} /f`);
     } else if (s === "2") {
       console.log("unset");
       unsetRegistry();
     } else if (s === "3") {
+      const assoc = exec("assoc .docx");
+      const entry = assoc.split("=")[1].trim();
+      const t = queryRegistry(
+        `reg query HKCR\\${entry}\\shell\\AutoRename\\command`
+      );
+      console.log(t);
+
       console.log("skip");
     } else if (s === "4") {
       console.log("min");
