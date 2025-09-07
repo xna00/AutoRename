@@ -4,16 +4,16 @@ import * as std from "std";
 import * as os from "os";
 import { DOMParser, serializeToWellFormedString } from "slimdom";
 import UZIP from "uzip";
-import parseArgs from 'minimist'
+import parseArgs from "minimist";
 
 const exec = (cmd: string) => {
-  const err = {}
+  const err = {};
   const f = std.popen(cmd, "r", err);
   if (!f) {
-    throw new Error(`Can not run: ${cmd}, errno is ${err}`)
+    throw new Error(`Can not run: ${cmd}, errno is ${err}`);
   }
-  return f.readAsString()
-}
+  return f.readAsString();
+};
 
 const readFileSync = (path: string) => {
   const f = std.open(path, "rb+");
@@ -53,7 +53,9 @@ const bufferToString = (buf: Uint8Array) => {
   return ret;
 };
 
-const args = parseArgs(globalThis.scriptArgs.slice(1))
+const [__filename] = os.realpath(globalThis.scriptArgs[0]);
+console.log(__filename);
+const args = parseArgs(globalThis.scriptArgs.slice(1));
 const info = `
 1: 设置注册表
 2: 取消设置注册表
@@ -61,24 +63,47 @@ const info = `
 4: 设置最小字号
 q: 退出
 
-`.trimStart()
+`.trimStart();
+const unsetRegistry = () => {
+  let oldEntry = "";
+  try {
+    const t = exec("reg query HKCU\\Software\\AutoRename /v Entry");
+    const e = t.split("REG_SZ")[1].trim();
+    oldEntry = e;
+  } catch {}
+  if (!oldEntry) {
+    return;
+  }
+  try {
+    exec(`reg delete HKCR\\${oldEntry}\\shell\\AutoRename /f`);
+  } catch {}
+};
 if (!args._[0]) {
-  while(true) {
-    console.log(info)
-    const c = std.getche()
-    const s = String.fromCharCode(c)
-    if (s === '1') {
-      console.log('设置注册表')
-    } else if (s === '2') {
-      console.log('unset')
-    } else if (s === '3') {
-      console.log('skip')
-    } else if (s === '4') {
-      console.log('min')
-    } else if (s === 'q') {
-      std.exit(0)
+  while (true) {
+    console.log(info);
+    const c = std.getche();
+    const s = String.fromCharCode(c);
+    if (s === "1") {
+      unsetRegistry();
+      console.log("设置注册表");
+      const assoc = exec("assoc .docx");
+      const entry = assoc.split("=")[1];
+      exec(`reg add HKCR\\${entry}\\shell\\AutoRename /ve /d "自动重命名" /f`);
+      exec(
+        `reg add HKCR\\${entry}\\shell\\AutoRename\\command /ve /d "${__filename} \"%1\"" /f`
+      );
+      exec(`reg add HKCU\\Software\\AutoRename /v Entry /d ${entry} /f`);
+    } else if (s === "2") {
+      console.log("unset");
+      unsetRegistry();
+    } else if (s === "3") {
+      console.log("skip");
+    } else if (s === "4") {
+      console.log("min");
+    } else if (s === "q") {
+      std.exit(0);
     } else {
-      console.log('输入错误')
+      console.log("输入错误");
     }
   }
 }
@@ -90,7 +115,6 @@ if (!filePath) {
   std.exit(1);
 }
 console.log("filePath", filePath);
-
 
 const file = readFileSync(filePath);
 const files = UZIP.parse(file);
@@ -171,4 +195,3 @@ if (title) {
   const dir = dirname(filePath);
   renameSync(filePath, `${dir}\\${title}.docx`);
 }
-
