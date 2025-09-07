@@ -94,7 +94,7 @@ if (!args._[0]) {
       console.log("设置注册表");
       const assoc = exec("assoc .docx");
       console.log("assoc", assoc);
-      const entry = assoc.split("=")[1];
+      const entry = assoc.split("=")[1].trim();
       console.log("entry", entry);
       console.log(
         "run: ",
