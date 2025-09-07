@@ -48,8 +48,11 @@ jobs:
       
       - name: Test
         run: |
+          chcp.com 936
           cp a.docx 测试.docx
+          ls -la
           ./dist/autorename.exe a.docx
+          ls -la
           ./dist/autorename.exe 测试.docx
           ls -la
 
