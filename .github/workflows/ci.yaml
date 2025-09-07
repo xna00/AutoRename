@@ -52,8 +52,8 @@ jobs:
           cp a.docx 测试.docx
           ls -la
           ./dist/autorename.exe a.docx
-          ls -la
-          ./dist/autorename.exe 测试.docx
+          # ls -la
+          # ./dist/autorename.exe 测试.docx
           ls -la
 
       - name: 上传构建产物
