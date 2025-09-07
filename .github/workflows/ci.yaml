@@ -41,7 +41,7 @@ jobs:
         run: |
           cp ../dist/main.js ./
           ./qjsc.exe -e -o autorename.c main.js
-          gcc autorename.c libquickjs.a -liconv -o autorename.exe
+          gcc autorename.c libquickjs.a -static -liconv -o autorename.exe
           strip autorename.exe
           cp autorename.exe ../dist/
         working-directory: ./quickjs
