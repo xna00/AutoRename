@@ -8,11 +8,16 @@ import parseArgs from "minimist";
 
 const exec = (cmd: string) => {
   const err = {};
+  console.log("run: ", cmd);
   const f = std.popen(cmd, "r", err);
   if (!f) {
     throw new Error(`Can not run: ${cmd}, errno is ${err}`);
   }
-  return f.readAsString();
+  console.log("done: ", cmd);
+  console.log("f: ", f);
+  const ret = f.readAsString();
+  console.log("ret: ", ret);
+  return ret;
 };
 
 const readFileSync = (path: string) => {
@@ -93,7 +98,7 @@ if (!args._[0]) {
       console.log("entry", entry);
       console.log(
         "run: ",
-        'reg add HKCR\\${entry}\\shell\\AutoRename /ve /d "自动重命名" /f'
+        `reg add HKCR\\${entry}\\shell\\AutoRename /ve /d "自动重命名" /f`
       );
       exec(`reg add HKCR\\${entry}\\shell\\AutoRename /ve /d "自动重命名" /f`);
 
