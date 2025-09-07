@@ -98,9 +98,11 @@ if (!args._[0]) {
       console.log("entry: ", entry);
       exec(`reg add HKCR\\${entry}\\shell\\AutoRename /ve /d "自动重命名" /f`);
 
+      // "C:\a.exe" "%1"
       exec(
-        `reg add HKCR\\${entry}\\shell\\AutoRename\\command /ve /d """${__filename}"" ""%1""" /f`
+        `reg add HKCR\\${entry}\\shell\\AutoRename\\command /ve /d """"${__filename}""" """%1"""" /f`
       );
+      
       exec(`reg add HKCU\\Software\\AutoRename /v Entry /d ${entry} /f`);
     } else if (s === "2") {
       console.log("unset");
