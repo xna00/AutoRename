@@ -93,25 +93,13 @@ if (!args._[0]) {
       unsetRegistry();
       console.log("设置注册表");
       const assoc = exec("assoc .docx");
-      console.log("assoc", assoc);
+      console.log("assoc: ", assoc);
       const entry = assoc.split("=")[1].trim();
-      console.log("entry", entry);
-      console.log(
-        "run: ",
-        `reg add HKCR\\${entry}\\shell\\AutoRename /ve /d "自动重命名" /f`
-      );
+      console.log("entry: ", entry);
       exec(`reg add HKCR\\${entry}\\shell\\AutoRename /ve /d "自动重命名" /f`);
 
-      console.log(
-        "run: ",
-        `reg add HKCR\\${entry}\\shell\\AutoRename\\command /ve /d "${__filename} \"%1\"" /f`
-      );
       exec(
-        `reg add HKCR\\${entry}\\shell\\AutoRename\\command /ve /d "${__filename} \"%1\"" /f`
-      );
-      console.log(
-        "run: ",
-        `reg add HKCU\\Software\\AutoRename /v Entry /d ${entry} /f`
+        `reg add HKCR\\${entry}\\shell\\AutoRename\\command /ve /d """${__filename}"" ""%1""" /f`
       );
       exec(`reg add HKCU\\Software\\AutoRename /v Entry /d ${entry} /f`);
     } else if (s === "2") {
