@@ -76,6 +76,7 @@ const unsetRegistry = () => {
   }
   try {
     exec(`reg delete HKCR\\${oldEntry}\\shell\\AutoRename /f`);
+    exec("reg delete HKCU\\Software\\AutoRename /f");
   } catch {}
 };
 if (!args._[0]) {
