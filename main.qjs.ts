@@ -113,8 +113,8 @@ if (!args._[0]) {
     if (s === "1") {
       unsetRegistry();
       console.log("设置注册表");
-      const assoc = exec("assoc .docx");
-      const entry = assoc.split("=")[1].trim();
+      const assoc = queryRegistry("HKCR\\.docx");
+      const entry = assoc.split("REG_SZ")[1].trim();
       console.log("entry: ", entry);
       exec(`reg add HKCR\\${entry}\\shell\\AutoRename /ve /d "自动重命名" /f`);
 
