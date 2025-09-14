@@ -14,7 +14,7 @@ if (!filePath) {
 }
 
 const file = readFileSync(filePath);
-const files = UZIP.parse(file.buffer);
+const files = UZIP.parse(Uint8Array.from(file).buffer);
 const documentXml = Buffer.from(files["word/document.xml"]).toString();
 const stylesXml = Buffer.from(files["word/styles.xml"]).toString();
 
