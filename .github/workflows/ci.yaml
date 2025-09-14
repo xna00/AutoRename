@@ -112,3 +112,33 @@ jobs:
         with:
           name: mingw-dist
           path: dist/
+
+  linux-nodejs-pkg:
+    name: Linux Node.js with pkg
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+    
+      - name: 安装 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      
+      - name: Install pkg
+        run: npm install -g pkg
+
+      - name: 安装依赖
+        run: npm i
+
+      - name: 构建
+        run: npm run build:nodejs
+
+      - name: 打包
+        run: pkg .
+
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: pkg-dist
+          path: dist/

@@ -1,10 +1,11 @@
 #! /usr/bin/env node
 
 import { DOMParser, serializeToWellFormedString } from "slimdom";
-import jszip from "jszip";
-import { readFileSync, renameSync } from "node:fs";
-import assert from "node:assert";
-import { dirname } from "node:path";
+// import jszip from "jszip";
+import { readFileSync, renameSync } from "fs";
+import assert from "assert";
+import { dirname } from "path";
+import UZIP from "uzip";
 
 const filePath = process.argv[2];
 if (!filePath) {
@@ -13,14 +14,10 @@ if (!filePath) {
 }
 
 const file = readFileSync(filePath);
-const r = (await jszip.loadAsync(file)).file("word/document.xml");
-const s = (await jszip.loadAsync(file)).file("word/styles.xml");
+const files = UZIP.parse(file.buffer);
+const documentXml = Buffer.from(files["word/document.xml"]).toString();
+const stylesXml = Buffer.from(files["word/styles.xml"]).toString();
 
-assert(r, "无法找到 word/document.xml");
-assert(s, "无法找到 word/styles.xml");
-
-const documentXml = await r.async("text");
-const stylesXml = await s.async("text");
 const styles = new DOMParser().parseFromString(stylesXml, "text/xml");
 const styleList = styles.getElementsByTagName("w:style");
 
@@ -45,30 +42,27 @@ for (const p of paragraphs) {
     continue;
   } else {
     if (!text) break;
-    const wr = p.getElementsByTagName("w:r").at(0);
+    const wr = p.getElementsByTagName("w:r")[0];
     assert(wr, "段落内没有文本");
-    let size = wr.getElementsByTagName("w:sz").at(0)?.getAttribute("w:val");
+    let size = wr.getElementsByTagName("w:sz")[0]?.getAttribute("w:val");
     if (!size) {
-      const ppr = p.getElementsByTagName("w:pPr").at(0);
+      const ppr = p.getElementsByTagName("w:pPr")[0];
       if (ppr) {
-        size = ppr.getElementsByTagName("w:sz").at(0)?.getAttribute("w:val");
+        size = ppr.getElementsByTagName("w:sz")[0]?.getAttribute("w:val");
       }
     }
     if (!size) {
-      const ppr = p.getElementsByTagName("w:pPr").at(0);
+      const ppr = p.getElementsByTagName("w:pPr")[0];
       if (ppr) {
         const pStyleId = ppr
-          .getElementsByTagName("w:pStyle")
-          .at(0)
+          .getElementsByTagName("w:pStyle")[0]
           ?.getAttribute("w:val");
         if (pStyleId) {
           const style = getStyleById(pStyleId);
           if (style) {
             size = style
-              .getElementsByTagName("w:rPr")
-              .at(0)
-              ?.getElementsByTagName("w:sz")
-              .at(0)
+              .getElementsByTagName("w:rPr")[0]
+              .getElementsByTagName("w:sz")[0]
               ?.getAttribute("w:val");
           }
         }
