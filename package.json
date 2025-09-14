@@ -6,7 +6,7 @@
   "bin": "dist/main.node.js",
   "pkg": {
     "targets": [
-      "node12-win-x64"
+      "node18-win-x64"
     ],
     "outputPath": "dist"
   },
@@ -14,7 +14,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npx tsc && npx esbuild main.qjs.ts --bundle --external:os --external:std --platform=browser --outfile=dist/main.js --format=esm && node moveImportsToTop.ts",
     "build:min": "npx tsc && npx esbuild dist/main.js --minify --bundle --external:os --external:std --platform=browser --outfile=dist/main.min.js --format=esm",
-    "build:nodejs": "npx tsc && npx esbuild main.ts --bundle --platform=node --outfile=dist/main.node.js --format=cjs --target=node8"
+    "build:nodejs": "npx tsc && npx esbuild main.ts --bundle --platform=node --outfile=dist/main.node.js --format=cjs --target=node18"
   },
   "keywords": [],
   "author": "",
