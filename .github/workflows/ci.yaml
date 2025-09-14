@@ -120,8 +120,8 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v4
 
-      - name: Install upx
-        run: sudo apt install upx-ucl
+      # - name: Install upx
+      #   run: sudo apt install upx-ucl
 
       - name: 安装 Node.js
         uses: actions/setup-node@v4
@@ -140,8 +140,8 @@ jobs:
       - name: 打包
         run: pkg .
 
-      - name: 压缩
-        run: upx dist/autorename.exe
+      # - name: 压缩
+      #   run: upx dist/autorename.exe
 
       - name: 上传构建产物
         uses: actions/upload-artifact@v4
